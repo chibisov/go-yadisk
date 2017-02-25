@@ -1,0 +1,39 @@
+package unit
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+
+	"github.com/chibisov/go-yadisk/yadisk"
+)
+
+var (
+	// mux is the HTTP request multiplexer used with the test server.
+	mux *http.ServeMux
+
+	// client is the Yandex.Disk client being tested.
+	client *yadisk.Client
+
+	// server is a test HTTP server used to provide mock API responses.
+	server *httptest.Server
+)
+
+// setup sets up a test HTTP server along with a yadisk.Client that is
+// configured to talk to that test server. Tests should register handlers on
+// mux which provide mock responses for the API method being tested.
+func setup() {
+	// test server
+	mux = http.NewServeMux()
+	server = httptest.NewServer(mux)
+
+	// yadisk client configured to use test server
+	client = yadisk.NewClient("ACCESS_TOKEN")
+	url, _ := url.Parse(server.URL)
+	client.BaseURL = url
+}
+
+// teardown closes the test HTTP server.
+func teardown() {
+	server.Close()
+}
