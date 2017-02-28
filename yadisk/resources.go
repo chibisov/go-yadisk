@@ -12,12 +12,12 @@ type Resource struct {
 	// Key of a published resource.
 	// It is included in the response only if
 	// the specified file or folder is published.
-	PublicKey string `json:"public_key"`
+	PublicKey *string `json:"public_key"`
 
 	// Resources directly contained in the folder.
 	// It is included in the response only
 	// when requesting metainformation about a folder.
-	Embedded ResourceList `json:"_embedded"`
+	Embedded *ResourceList `json:"_embedded"`
 
 	// Resource name
 	Name string `json:"name"`
@@ -27,17 +27,17 @@ type Resource struct {
 	Created time.Time `json:"created"`
 
 	// Object with the user defined attributes
-	CustomProperties map[string]string `json:"custom_properties"`
+	CustomProperties *map[string]string `json:"custom_properties"`
 
 	// Link to a published resource.
 	// It is included in the response only if
 	// the specified file or folder is published.
-	PublicURL string `json:"public_url"`
+	PublicURL *string `json:"public_url"`
 
 	// Path to the resource before it was moved to the Trash.
 	// Included in the response only for a request
 	// for metainformation about a resource in the Trash.
-	OriginPath string `json:"origin_path"`
+	OriginPath *string `json:"origin_path"`
 
 	// The date and time the resource was modified.
 	// JSON data is in ISO 8601 format.
@@ -56,12 +56,24 @@ type Resource struct {
 	// MD5 hash of the file.
 	MD5 string `json:"md5"`
 
+	// sha256 hash of the file.
+	SHA256 string `json:"sha256"`
+
+	// Revision number of the resource.
+	Revision uint `json:"revision"`
+
+	// Unique resource id.
+	ResourceID string `json:"resource_id"`
+
 	// Resource type:
 	// * "dir" - folder
 	// * "file" - file
 	Type string `json:"type"`
 
-	// The MIME type of the file.
+	// The media type of the file (e.g. "image").
+	MediaType string `json:"media_type"`
+
+	// The MIME type of the file (e.g. image/jpeg).
 	MimeType string `json:"mime_type"`
 
 	// File size.
@@ -207,6 +219,18 @@ func (s *ResourcesService) Get(
 	ctx context.Context,
 	path string,
 	opt *ResourcesOptions,
-) ([]*ResourceList, *http.Response, error) {
-	return nil, nil, nil
+) (*Resource, *http.Response, error) {
+	url := "resources"
+	req, err := s.client.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resource := new(Resource)
+	resp, err := s.client.Do(ctx, req, resource)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return resource, resp, nil
 }

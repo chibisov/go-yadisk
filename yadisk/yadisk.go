@@ -27,7 +27,8 @@ type Client struct {
 	BaseURL *url.URL
 
 	// Services used for talking to different parts of the Yandex.Disk API.
-	Disk *DiskService
+	Disk      *DiskService
+	Resources *ResourcesService
 }
 
 type service struct {
@@ -47,6 +48,7 @@ func NewClient(accessToken string) *Client {
 		AccessToken: accessToken,
 	}
 	c.Disk = &DiskService{client: c}
+	c.Resources = &ResourcesService{client: c}
 
 	return c
 }
